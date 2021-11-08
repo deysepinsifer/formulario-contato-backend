@@ -1,0 +1,25 @@
+{
+  "name": "formulario",
+  "version": "1.0.0",
+  "description": "formulario",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "deyse",
+  "license": "ISC",
+  "dependencies": {
+    "ajax": "0.0.4",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "handlebars": "^4.7.7",
+    "knex": "^0.95.11",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.0",
+    "nodemailer": "^6.7.0",
+    "nodemon": "^2.0.13",
+    "sequelize": "^6.6.5"
+  }
+}
