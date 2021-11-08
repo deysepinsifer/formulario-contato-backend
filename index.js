@@ -22,25 +22,25 @@ function formularioDeContato(req, res){
     const telefone = req.body.telefone;
     const mensagem = req.body.mensagem;
 
-    if(nome === "" || nome === undefined){
+    if(!nome){
         res.status(400);
         res.send("Erro: nome é obrigatório");
         return;
     }
 
-    if(email === "" || email === undefined){
+    if(!email){
         res.status(400);
         res.send("Erro: email é obrigatório");
         return;
     }
 
-    if(telefone === "" || telefone === undefined){
+    if(!telefone){
         res.status(400);
         res.send("Erro: telefone é obrigatório");
         return;
     }
 
-    if(mensagem === "" || mensagem === undefined){
+    if(!mensagem){
         res.status(400);
         res.send("Erro: mensagem é obrigatória");
         return;
