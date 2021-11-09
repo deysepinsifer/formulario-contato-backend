@@ -8,7 +8,7 @@ const EnviadorDeEmail = (contato) => {
         secure: true, // true for 465, false for other ports
         auth: {
             user: "deysedel@gmail.com",
-            pass: "Isabella14@"
+            pass: ""
         },
     });
     
