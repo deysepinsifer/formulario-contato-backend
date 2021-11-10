@@ -1,5 +1,6 @@
 
 const nodemailer = require('nodemailer')
+require('dotenv').config()
 
 const EnviadorDeEmail = (contato) => {
     const transporter = nodemailer.createTransport({
@@ -7,13 +8,15 @@ const EnviadorDeEmail = (contato) => {
         port: 465,
         secure: true, // true for 465, false for other ports
         auth: {
-            user: "deysedel@gmail.com",
-            pass: "Isabella14@"
+        
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
         },
+       
     });
     
     const mailOptions = {
-        from: 'Deyse <deysedel@gmail.com>',
+        from: 'Gleidson <gleidson.ferreirasantos@gmail.com>',
         to: 'gleidson.ferreirasantos@gmail.com',
         subject: "Contato pelo formulário do site",
         html: `<p><b>Nome:</b> ${contato.nome}</p><p><b> Telefone:</b> <p><b>${contato.telefone}</b> Email: ${contato.email}\n Mensagem: ${contato.mensagem}`

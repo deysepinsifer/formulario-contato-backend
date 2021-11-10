@@ -2,8 +2,10 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
 const cadastroDB = require("./bd")
+const dataBase = require('./comunicacaoBanco')
 const EnviadorDeEmail = require("./enviadorDeEmail");
 const cors = require('cors')
+
 
 
 app.use(bodyParser.urlencoded({extended:true}))
@@ -53,13 +55,25 @@ function formularioDeContato(req, res){
         mensagem: mensagem
     }).then(function(){
         res.send("Formulario cadastrado com sucesso!")
-        EnviadorDeEmail({nome, email, telefone, mensagem});
+      // EnviadorDeEmail({nome, email, telefone, mensagem});
     }).catch(function(erro){
         console.error(erro);
         res.send("Erro: Formulario não cadastrado!")
     })
 }
 
-app.post('/formulario', formularioDeContato)
+function buscarContatos(req, res){
+    dataBase.sequelize.query("SELECT * FROM cadastros", { type: dataBase.Sequelize.QueryTypes.SELECT})
+    .then(function(contatos) {
+        res.send(contatos)
+    }).catch(function(erro){
+        console.error(erro);
+        res.status(500);
+        res.send("Erro ao buscar os dados!")
+    })
+}
+
+app.post('/formulario', formularioDeContato);
+app.get('/formulario', buscarContatos);
 
 app.listen('3000', () => { console.log("Server iniciado") } );
