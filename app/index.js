@@ -37,7 +37,7 @@ function deletarContato(req, res){
     }).catch(function(erro){
         console.error(erro);
         res.status(500);
-        res.send("Erro ao buscar os dados!")
+        res.send("Erro ao deletar os dados!")
     })
 }
 
@@ -48,7 +48,15 @@ function editarContato (req, res) {
     UPDATE cadastro 
             set nome='${req.body.nome}',
             email='${req.body.email}',
+            cep='${req.body.cep}',
+            logradouro='${req.body.logradouro}',
+            endereco='${req.body.endereco}',
+            complemento='${req.body.complemento}',
+            cidade='${req.body.cidade}',
+            estado='${req.body.estado}',
+            tipo='${req.body.tipo}',
             telefone='${req.body.telefone}'
+            mensagem='${req.body.mensagem}'
         WHERE id = ${req.params.id}
    `, { type: dataBase.Sequelize.QueryTypes.UPDATE})
         .then(function(contato) {

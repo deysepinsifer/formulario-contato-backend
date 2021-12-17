@@ -14,4 +14,21 @@ console.log(mensagem, clienteId);
     }
 }
 
+function validar( mensagem){
+
+    if(!mensagem){
+        throw new Error("Erro: mensagem é obrigatória");
+    } 
+
+}
+
+const salvarFormularioDeContato = async (mensagem) => {
+    validar(mensagem);
+    const cliente = await cadastrarMensagem(mensagem);
+    cadastrarMensagem(mensagem, cliente.id);
+}
+
+module.exports = salvarFormularioDeContato
+
+
 module.exports = inserir

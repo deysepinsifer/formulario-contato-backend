@@ -1,5 +1,5 @@
 CREATE TABLE solicitacao (
-  id int(11) NOT NULL primary key AUTO_INCREMENT,
+  id int NOT NULL primary key AUTO_INCREMENT,
   mensagem varchar(5000) NOT NULL,
   cliente_id int(11) NOT NULL,
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,

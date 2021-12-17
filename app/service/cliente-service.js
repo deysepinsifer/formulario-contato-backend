@@ -1,5 +1,7 @@
+
 const dataBase = require('../comunicacaoBanco')
 const clienteRepository = require('./../repository/cliente-repository')
+
 
 const buscarPorEmail = async ( email ) => {
     try {
@@ -13,7 +15,7 @@ const buscarPorEmail = async ( email ) => {
     }
 }
 
-const inserirOuBuscar = async (nome, email, telefone) => {
+const inserirOuBuscar = async (nome, email) => {
 
     const clienteJaNoBanco = await buscarPorEmail(email);
     try {
@@ -22,7 +24,7 @@ const inserirOuBuscar = async (nome, email, telefone) => {
             const resultado = await clienteRepository.create({
                 nome: nome,
                 email: email,
-                telefone: telefone,
+               
             });
             return resultado.dataValues;
         }

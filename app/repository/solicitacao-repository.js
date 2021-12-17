@@ -5,8 +5,9 @@ const solicitacao = dataBase.sequelize.define('solicitacao', {
         type: dataBase.Sequelize.STRING
     },
     cliente_id: {
-        type: dataBase.Sequelize.BIGINT
-    }  
+        type: dataBase.Sequelize.INTEGER
+    }
+   
 }, { freezeTableName: true });
 
 module.exports = solicitacao
