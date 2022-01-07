@@ -1,16 +1,17 @@
 const dataBase = require('../comunicacaoBanco')
 
 const endereco = dataBase.sequelize.define('endereco', {
-    id: {
-        type: dataBase.Sequelize.INTEGER
-    },
+    
     cep: {
         type: dataBase.Sequelize.STRING
     },
+    tipo_de_logradouro: {
+        type: dataBase.Sequelize.STRING
+    }, 
     logradouro: {
         type: dataBase.Sequelize.STRING
     }, 
-    endereco: {
+    numero: {
         type: dataBase.Sequelize.STRING
     }, 
     bairro: {

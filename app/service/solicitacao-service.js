@@ -1,6 +1,9 @@
+
+const solicitacao = require('../repository/solicitacao-repository');
 const solicitacaoRepository = require('../repository/solicitacao-repository')
 
-const inserir = async (mensagem, clienteId ) => {
+const inserirSolicitacao = async (mensagem, clienteId ) => {
+    validar(mensagem);
 console.log(mensagem, clienteId);
     try {
         const resultado = await solicitacaoRepository.create({
@@ -22,13 +25,27 @@ function validar( mensagem){
 
 }
 
-const salvarFormularioDeContato = async (mensagem) => {
+const editarSolicitacao = async (id, mensagem) => {
+    const clienteBuscado = await buscarPorId(id);
+    
+    if(!clienteBuscado.length){
+        throw Error("Cliente não existe");
+    }
+
     validar(mensagem);
-    const cliente = await cadastrarMensagem(mensagem);
-    cadastrarMensagem(mensagem, cliente.id);
+
+    const solicitacaoAtualizado = await dataBase.sequelize.query(`
+    UPDATE solicitacao
+            set solicitacao='${solicitacao}'
+            WHERE id=${id}
+            `, { type: dataBase.Sequelize.QueryTypes.UPDATE});
+
+    return solicitacaoAtualizado;
+
 }
 
-module.exports = salvarFormularioDeContato
 
-
-module.exports = inserir
+module.exports = {
+    inserirSolicitacao,
+    editarSolicitacao
+}

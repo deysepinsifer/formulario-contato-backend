@@ -1,7 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
-const salvarFormularioDeContato = require("./controller/formulario-contato-controller")
+const formularioDeContatoService = require("./controller/formulario-contato-controller")
 const dataBase = require('./comunicacaoBanco')
 const EnviadorDeEmail = require("./enviadorDeEmail");
 const cors = require('cors')
@@ -18,20 +18,31 @@ app.use((req, res, next) =>{
     next();
 })
 
-function buscarContatos(req, res){
-    dataBase.sequelize.query("SELECT * FROM cadastro", { type: dataBase.Sequelize.QueryTypes.SELECT})
+function buscarClientes(req, res){
+    dataBase.sequelize.query(`SELECT
+    distinct c.id,
+    c.nome,
+    c.email,
+    e.logradouro,
+    e.bairro,
+    e.cidade,
+    e.estado,
+    t.numero_tel as telefone
+   FROM cliente c
+   left join endereco e on e.cliente_id = c.id
+   left join telefone t on t.cliente_id = c.id`, { type: dataBase.Sequelize.QueryTypes.SELECT})
     .then(function(contatos) {
         res.send(contatos)
     }).catch(function(erro){
         console.error(erro);
         res.status(500);
-        res.send("Erro ao buscar os dados!")
+        res.send("Erro ao buscar os dados no buscar clientes!")
     })
 }
 
 function deletarContato(req, res){
     console.log(req.params.id);
-    dataBase.sequelize.query(`DELETE FROM cadastro where id = ${req.params.id}`, { type: dataBase.Sequelize.QueryTypes.DELETE})
+    dataBase.sequelize.query(`DELETE FROM contatos where id = ${req.params.id}`, { type: dataBase.Sequelize.QueryTypes.DELETE})
     .then(function(contatos) {
         res.send(contatos)
     }).catch(function(erro){
@@ -41,36 +52,23 @@ function deletarContato(req, res){
     })
 }
 
-function editarContato (req, res) {
-    console.log(req.params);
-    console.log(req.body);
-    dataBase.sequelize.query(`
-    UPDATE cadastro 
-            set nome='${req.body.nome}',
-            email='${req.body.email}',
-            cep='${req.body.cep}',
-            logradouro='${req.body.logradouro}',
-            endereco='${req.body.endereco}',
-            complemento='${req.body.complemento}',
-            cidade='${req.body.cidade}',
-            estado='${req.body.estado}',
-            tipo='${req.body.tipo}',
-            telefone='${req.body.telefone}'
-            mensagem='${req.body.mensagem}'
-        WHERE id = ${req.params.id}
-   `, { type: dataBase.Sequelize.QueryTypes.UPDATE})
-        .then(function(contato) {
-            res.send(contato)
-    })  .catch(function(erro){
-            console.error(erro);
-            res.status(500);
-            res.send("Erro ao buscar os dados!")
-    })
-}
+
 
 function buscarPorId (req, res) {
     console.log(req.params.id);
-    dataBase.sequelize.query(`SELECT * FROM cadastro  where id = ${req.params.id}`, { type: dataBase.Sequelize.QueryTypes.SELECT})
+    dataBase.sequelize.query(`SELECT 
+    c.id,
+    c.nome,
+    c.email,
+    e.logradouro,
+    e.bairro,
+    e.cidade,
+    e.estado,
+    t.numero_tel as telefone
+    FROM cliente c
+    left join endereco e on e.cliente_id = c.id
+    left join telefone t on t.cliente_id = c.id
+    where c.id = ${req.params.id}`, { type: dataBase.Sequelize.QueryTypes.SELECT})
     .then(function(contatos) {
 
         if(contatos.length){
@@ -83,16 +81,16 @@ function buscarPorId (req, res) {
     }).catch(function(erro){
         console.error(erro);
         res.status(500);
-        res.send("Erro ao buscar os dados!")
+        res.send("Erro ao buscar os dados no buscar por id!")
     })
 }
 
 
-app.post('/formulario', salvarFormularioDeContato);
-app.get('/formulario', buscarContatos);
+app.post('/formulario', formularioDeContatoService.salvarFormularioDeContato);
+app.get('/formulario/', buscarClientes);
 app.get('/formulario/:id', buscarPorId);
 app.delete('/formulario/:id', deletarContato);
-app.put('/formulario/:id', editarContato);
+app.put('/formulario/:id', formularioDeContatoService.editarFormulario);
 
 
 app.listen('3000', () => { console.log("Server iniciado") } );

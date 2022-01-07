@@ -1,9 +1,11 @@
+
 create table endereco(
 	id int primary key auto_increment,	
-	cep varchar(10),
-	logradouro varchar(30)not null,
-	endereco varchar(100)not null,
-	bairro varchar(100),
+	cep varchar(10) not null,
+	tipo_de_logradouro varchar(30)not null,
+	logradouro varchar(100)not null,
+	numero varchar(15) not null,
+	bairro varchar(100)not null,
 	complemento varchar(100),
 	cidade varchar(50) not null,
 	estado char(2) not null,
@@ -13,3 +15,4 @@ create table endereco(
 	);
 	
 	alter table endereco add constraint fk_cliente_endereco foreign key (cliente_id) references cliente(id);
+
