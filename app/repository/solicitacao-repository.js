@@ -7,7 +7,7 @@ const solicitacao = dataBase.sequelize.define('solicitacao', {
     cliente_id: {
         type: dataBase.Sequelize.INTEGER
     }
-   
+
 }, { freezeTableName: true });
 
 module.exports = solicitacao

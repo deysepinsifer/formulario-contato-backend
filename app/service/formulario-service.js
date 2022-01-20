@@ -2,26 +2,53 @@ const clienteService = require('./cliente-service');
 const solicitacaoService = require('./solicitacao-service');
 const enderecoService = require('./endereco-service');
 const telefoneService = require('./telefone-service');
-const clienteService = require('./cliente-service');
-const enderecoService = require('./endereco-service');
-const solicitacaoService = require('./solicitacao-service');
+
 const { required } = require('nodemon/lib/config');
+const { sequelize } = require('../comunicacaoBanco');
 
-const salvarFormularioDeContato = async (nome, email, cep, tipoDeLogradouro, logradouro, numero, bairro, complemento, cidade, estado, tipo, ddd, numeroTel, mensagem) => {
-    const cliente = await clienteService.inserirOuBuscar(nome, email);
-     await solicitacaoService.inserirSolicitacao(mensagem, cliente.id);
-     await enderecoService.inserirEndereco(cep, tipoDeLogradouro, logradouro, numero, bairro, complemento, cidade, estado, cliente.id);
-     await telefoneService.inserirTelefone(tipo, ddd, numeroTel, cliente.id);
+const buscarContatos = async (id, nome, email) => {
+    const clientes = await clienteService.buscarClientes(id, nome, email);
+    return clientes;
 }
 
-const editarFormularioDeContato = async (id, nome, email, cep, tipoDeLogradouro, logradouro, numero, bairro, complemento, cidade, estado, tipo, ddd, numeroTel, mensagem) => {
-    const cliente = await clienteService.editarCliente(id, nome, email);
-    await solicitacaoService.editarSolicitacao(mensagem, cliente.id);
-    await enderecoService.editarEndereco(cep, tipoDeLogradouro, logradouro, numero, bairro, complemento, cidade, estado, cliente.id);
-    await telefoneService.editarTelefone(tipo, ddd, numeroTel, cliente.id);
+const buscarClientePorIdCompleto = async (id) => {
+    const clientesPorId = await clienteService.buscarClientePorIdCompleto(id);
+    return clientesPorId;
 }
+
+const salvarFormularioDeContato = (nome, email, cep, tipoDeLogradouro, logradouro, numero, complemento, bairro, cidade, estado, tipo, ddd, numeroTel, mensagem) => {
+
+    sequelize.transaction(async function (t) {
+        const cliente = await clienteService.inserir(nome, email, {transaction: t})
+        return Promise.all([
+            enderecoService.inserirEnd(cep, tipoDeLogradouro, logradouro, numero, complemento, bairro, cidade, estado, cliente.id, {transaction: t}),
+            telefoneService.inserirTelefone(tipo, ddd, numeroTel, cliente.id, {transaction: t}),
+            solicitacaoService.inserirSolicitacao(mensagem, cliente.id, {transaction: t})
+        ]);
+    });
+}
+
+const editarFormulario = async (reference, nome, email, cep, tipoDeLogradouro, logradouro, bairro, cidade, estado, tipo, ddd, numeroTel) => {
+
+    const cliente = await clienteService.buscarClientePorReference(reference);
+
+    await clienteService.editarCliente(cliente.id, nome, email);
+    await enderecoService.editarEndereco(cliente.id, cep, tipoDeLogradouro, logradouro, bairro, cidade, estado);
+    await telefoneService.editarTelefone(cliente.id, tipo, ddd, numeroTel);
+}
+
+const excluirContato = async (id) => {
+    await solicitacaoService.excluirSolicitacao(id);
+    await enderecoService.excluirEndereco(id);
+    await telefoneService.excluirTelefone(id);
+    await clienteService.excluirCliente(id);
+}
+
 
 module.exports = {
+    buscarContatos,
     salvarFormularioDeContato,
-    editarFormularioDeContato
+    editarFormulario,
+    excluirContato,
+    buscarClientePorIdCompleto
 }

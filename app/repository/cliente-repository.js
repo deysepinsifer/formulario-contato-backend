@@ -8,7 +8,7 @@ const cliente = dataBase.sequelize.define('cliente', {
     email: {
         type: dataBase.Sequelize.STRING
     },
-   
+
 }, { freezeTableName: true });
 
 module.exports = cliente

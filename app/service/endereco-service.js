@@ -1,45 +1,22 @@
-
+const dataBase = require('../comunicacaoBanco')
 const enderecoRepository = require('../repository/endereco-repository')
 
-const inserirEnd = async (cep, tipoDeLogradouro, logradouro, numero, bairro, complemento, cidade, estado, clienteId) => {
-    validar(cep, tipoDeLogradouro, logradouro, numero, bairro, complemento, cidade, estado);
-    console.log(cep, tipoDeLogradouro, logradouro, numero, bairro, complemento, cidade, estado, clienteId);
-    try {
-        const resultado = await enderecoRepository.create({
-            cep,
-            tipo_de_logradouro: tipoDeLogradouro,
-            logradouro,
-            numero,
-            bairro,
-            complemento,
-            cidade,
-            estado,
-            cliente_id: clienteId,/*  */
-        });
-        return resultado;
-    } catch (erro) {/*  */
-        console.error(erro);
-        throw new Error(erro);
-    }
-}
 
-function validar(cep, tipoDeLogradouro, logradouro, numero, bairro, cidade, estado) {
+function validar(cep, tipoDeLogradouro, logradouro, bairro, cidade, estado) {
 
+    
     if (!cep) {
         throw new Error("Erro: cep é obrigatório");
     }
 
     if (!tipoDeLogradouro) {
-        throw new Error("Erro tipo de logradouro é obrigatório");
+        throw new Error("Erro: tipo de logradouro é obrigatório");
     }
+   
     if (!logradouro) {
         throw new Error("Erro: logradouro é obrigatório");
     }
-
-    if (!numero) {
-        throw new Error("Erro: numero é obrigatório");
-    }
-
+    
     if (!bairro) {
         throw new Error("Erro: bairro é obrigatório");
     }
@@ -53,31 +30,87 @@ function validar(cep, tipoDeLogradouro, logradouro, numero, bairro, cidade, esta
     }
 }
 
-const editarEndereco = async (id, logradouro, bairro, cidade, estado) => {
-    const clienteBuscado = await buscarPorId(id);
-    
-    if(!clienteBuscado.length){
+const inserirEnd = async (cep, tipoDeLogradouro, logradouro, numero, complemento, bairro, cidade, estado, clienteId, transaction) => {
+    console.log(cep, tipoDeLogradouro, logradouro, numero, complemento, bairro, cidade, estado, clienteId);
+    validar(cep, tipoDeLogradouro, logradouro, bairro, cidade, estado);
+
+    try {
+        const resultado = await enderecoRepository.create({
+            cep,
+            tipo_de_logradouro: tipoDeLogradouro,
+            logradouro,
+            numero,
+            complemento,
+            bairro,
+            cidade,
+            estado,
+            cliente_id: clienteId
+        }, transaction);
+        return resultado;
+    } catch (erro) {/*  */
+        console.error(erro);
+        
+        throw new Error(erro);
+    }
+}
+
+
+const buscarPorId = async (id) => {
+    try {
+        const clienteJaNoBanco = await enderecoRepository
+            .sequelize.query(`SELECT * FROM endereco  where cliente_id = '${id}'`,
+                { type: dataBase.Sequelize.QueryTypes.SELECT });
+        return clienteJaNoBanco;
+    } catch (erro) {
+        console.error(erro);
+        throw new Error(erro);
+    }
+}
+
+
+const editarEndereco = async (clienteId, cep, tipoDeLogradouro, logradouro, bairro, cidade, estado) => {
+    const enderecoBuscado = await buscarPorId(clienteId);
+
+    if (!enderecoBuscado.length) {
         throw Error("Cliente não existe");
     }
 
-    validar(numeroTel);
+    validar(cep, tipoDeLogradouro, logradouro, bairro, cidade, estado);
 
     const enderecoAtualizado = await dataBase.sequelize.query(`
     UPDATE endereco
-            set logradouro='${logradouro}',
-             bairro='${bairro}',
-             cidade='${cidade}',
-             estado='${estado}'
-            WHERE id=${id}
-            `, { type: dataBase.Sequelize.QueryTypes.UPDATE});
+            set cep='${cep}',
+            tipo_de_logradouro='${tipoDeLogradouro}',
+            logradouro='${logradouro}',
+            bairro='${bairro}',
+            cidade='${cidade}',
+            estado='${estado}'
+            WHERE cliente_id=${clienteId}
+            `, { type: dataBase.Sequelize.QueryTypes.UPDATE });
 
     return enderecoAtualizado;
 
 }
 
-module.exports ={
-     inserirEnd,
-     editarEndereco
+const excluirEndereco = async (id) => {
+    try {
+        await enderecoRepository
+            .sequelize.query(`DELETE FROM endereco  where cliente_id = '${id}'`,
+                { type: dataBase.Sequelize.QueryTypes.DELETE });
+
+    } catch (erro) {
+        console.error(erro);
+        throw new Error(erro);
+    }
+}
+
+
+
+module.exports = {
+
+    inserirEnd,
+    editarEndereco,
+    excluirEndereco
 }
 
 
